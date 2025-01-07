@@ -1,9 +1,14 @@
+<?php
+//Manila Timezone
+date_default_timezone_set('Asia/Manila');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Confirmation Default Page</title>
+    <title>Break Out Page</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/jellee-heavy" rel="stylesheet">
@@ -34,16 +39,25 @@
         <div class="w-full sm:w-[450px] md:w-[500px] lg:w-[620px] xl:w-[700px] bg-white rounded-lg shadow-lg">
             <!-- Date -->
             <div class="bg-[#FDB55E] midnight-color text-[32px] py-2 rounded-t-lg text-center">
-                November 21, 2024
+                <?php echo date('F j, Y'); ?>
             </div>
-            <!-- Body Section -->
             <div class="p-6 text-center">
                 <!-- Time -->
-                <p class="midnight-color text-[60px] md:text-[80px] lg:text-[100px] xl:text-[120px] leading-none">09:00 am</p>
+                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
+                    <?php echo date('g:i a');?>
+                </p>
             </div>
         </div>
-        <!-- Please Tap Your Card -->
-        <p class="midnight-color text-[45px] mt-4">Please Tap Your Card</p>
+        <!-- -->
+        <p class="midnight-color text-[40px] mt-4">Hi, Name!</p>
+        <p class="midnight-color text-[28px]"></p>
+        <!-- Break-out Button -->
+        <div>
+            <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
+                px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300">
+                Break Out
+            </button>
+        </div>        
     </div>
 </body>
 </html>
