@@ -43,7 +43,7 @@ date_default_timezone_set('Asia/Manila');
             </div>
             <div class="p-6 text-center">
                 <!-- Time -->
-                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
+                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[100px] leading-none">
                     <?php echo date('g:i a');?>
                 </p>
             </div>
@@ -53,14 +53,19 @@ date_default_timezone_set('Asia/Manila');
         <p class="midnight-color text-[28px]">Choose your action</p>
         <!-- Time-In Button -->
         <div>
+        <form method="POST" action="confirmation-page.php">
+            <input type="hidden" name="time" value="<?php echo date('g:i a'); ?>">
             <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
-                px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300">
+                px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300"
+                name="action" value="Break In">
                 Break-In
             </button>
             <button class="mt-6 ml-8 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
-            px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300" ">
+            px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300" 
+            name="action" value="Time Out">
                 Time-Out
             </button>
+        </form>
         </div>        
     </div>
 </body>

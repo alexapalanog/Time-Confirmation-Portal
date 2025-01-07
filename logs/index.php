@@ -8,7 +8,7 @@ date_default_timezone_set('Asia/Manila');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Confirmation Default Page</title>
+    <title>Time In Page</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/jellee-heavy" rel="stylesheet">
@@ -41,16 +41,14 @@ date_default_timezone_set('Asia/Manila');
             <div class="bg-[#FDB55E] midnight-color text-[32px] py-2 rounded-t-lg text-center">
                 <?php echo date('F j, Y'); ?>
             </div>
-            <!-- Body Section -->
             <div class="p-6 text-center">
                 <!-- Time -->
-                <p class="midnight-color text-[60px] md:text-[80px] lg:text-[90px] xl:text-[110px] leading-none">
+                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
                     <?php echo date('g:i a');?>
                 </p>
             </div>
         </div>
-        <!-- Please Tap Your Card -->
-        <p class="midnight-color text-[45px] mt-4">Please Tap Your Card</p>
+        <p class="midnight-color text-[40px] mt-4">Please Tap Your Card</p> 
     </div>
 </body>
 </html>

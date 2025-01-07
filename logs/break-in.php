@@ -1,5 +1,5 @@
 <?php
-//Manila Timezone
+// Manila Timezone
 date_default_timezone_set('Asia/Manila');
 ?>
 
@@ -43,7 +43,7 @@ date_default_timezone_set('Asia/Manila');
             </div>
             <div class="p-6 text-center">
                 <!-- Time -->
-                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
+                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[100px] leading-none">
                     <?php echo date('g:i a');?>
                 </p>
             </div>
@@ -51,14 +51,18 @@ date_default_timezone_set('Asia/Manila');
         <!-- -->
         <p class="midnight-color text-[40px] mt-4">Hi, Name!</p>
         <p class="midnight-color text-[28px]">Choose your action</p>
-        <!-- Time-In Button -->
-        <div>
-            <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
-                px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300">
-                Break-In
-            </button>
-            <button class="mt-6 ml-8 bg-[#666666] text-black text-[28px] font-bold py-2.5
-                px-6 w-[250px] rounded-xl ">
+        <!-- Buttons in the Same Row -->
+        <div class="flex justify-center mt-6 space-x-4">
+            <form method="POST" action="confirmation-page.php">
+                <input type="hidden" name="time" value="<?php echo date('g:i A'); ?>">
+                <button 
+                    class="bg-[#BB4947] text-white text-[28px] font-bold py-2.5 px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300"
+                    name="action" value="Break in">
+                    Break-In
+                </button>
+            </form>
+            <button class="bg-[#666666] text-black text-[28px] font-bold py-2.5
+                px-6 w-[250px] rounded-xl">
                 Time-Out
             </button>
         </div>        
