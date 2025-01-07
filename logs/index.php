@@ -1,5 +1,5 @@
 <?php
-//Manila Timezone
+// Manila Timezone
 date_default_timezone_set('Asia/Manila');
 ?>
 
@@ -24,6 +24,30 @@ date_default_timezone_set('Asia/Manila');
             color: #121212;
         }
     </style>
+    <script>
+        // JavaScript to handle dynamic time updates
+        function updateTime() {
+            const timeElement = document.getElementById('time');
+            const date = new Date();
+
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'pm' : 'am';
+            const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+            const timeString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+            timeElement.textContent = timeString;
+        }
+
+        function initClock() {
+            updateTime(); // Update time immediately on page load
+            setInterval(updateTime, 1000); // Update every second
+        }
+
+        // Execute clock function after DOM loads
+        window.onload = initClock;
+    </script>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-[#FFE6A3]">
     <!-- Main Container with margin-top to adjust the positioning -->
@@ -43,8 +67,8 @@ date_default_timezone_set('Asia/Manila');
             </div>
             <div class="p-6 text-center">
                 <!-- Time -->
-                <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
-                    <?php echo date('g:i a');?>
+                <p id="time" class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
+                    <?php echo date('g:i a'); ?>
                 </p>
             </div>
         </div>
