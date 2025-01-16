@@ -12,7 +12,7 @@ $actionType = isset($_POST['action']) ? $_POST['action'] : 'Unknown Action';
     <title>Confirmation Page</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/jellee-heavy" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/jellee" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-[#FFE6A3]">
@@ -23,7 +23,7 @@ $actionType = isset($_POST['action']) ? $_POST['action'] : 'Unknown Action';
             <img src="../images/jabee logo.png" alt="Jollibee Logo" class="w-20 h-25 mr-8">
             <h1 
                 class="text-red-600 text-[42px] font-extrabold tracking-wide"
-                style="font-family: 'Jellee Heavy', sans-serif;">
+                style="font-family: 'Jellee', sans-serif;">
                 Jollibee
             </h1>
         </div>
