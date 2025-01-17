@@ -55,7 +55,7 @@ date_default_timezone_set('Asia/Manila');
         <!-- Logo and Jollibee Title -->
         <div class="flex items-center justify-center mb-6">
             <img src="../images/jabee logo.png" alt="Jollibee Logo" class="w-20 h-25 mr-8">
-            <h1 class="text-red-600 text-[60px] font-extrabold jollibee-font tracking-wide">Jollibee</h1>
+            <h1 class="text-red-600 text-[60px] jollibee-font tracking-wide">Jollibee</h1>
         </div>
         <!-- Time Confirmation Portal-->
         <p class="midnight-color text-[42px] font-bold mb-4 -mt-5">Time Confirmation Portal</p>

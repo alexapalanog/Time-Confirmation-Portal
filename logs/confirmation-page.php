@@ -22,7 +22,7 @@ $actionType = isset($_POST['action']) ? $_POST['action'] : 'Unknown Action';
         <div class="flex items-center justify-center mb-8">
             <img src="../images/jabee logo.png" alt="Jollibee Logo" class="w-20 h-25 mr-8">
             <h1 
-                class="text-red-600 text-[42px] font-extrabold tracking-wide"
+                class="text-red-600 text-[42px] tracking-wide"
                 style="font-family: 'Jellee', sans-serif;">
                 Jollibee
             </h1>

@@ -34,7 +34,7 @@ date_default_timezone_set('Asia/Manila');
             <h1 class="text-red-600 text-[60px] font-extrabold jollibee-font tracking-wide">Jollibee</h1>
         </div>
         <!-- Time Confirmation Portal-->
-        <p class="midnight-color text-[42px] font-bold mb-4 -mt-5">Time Confirmation Portal</p>
+        <p class="midnight-color text-[42px]  mb-4 -mt-5">Time Confirmation Portal</p>
         <!-- Date and Time Card (Responsive Width) -->
         <div class="w-full sm:w-[450px] md:w-[500px] lg:w-[620px] xl:w-[700px] bg-white rounded-lg shadow-lg">
             <!-- Date -->
