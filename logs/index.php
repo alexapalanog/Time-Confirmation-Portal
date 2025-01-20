@@ -1,6 +1,7 @@
 <?php
 // Manila Timezone
 date_default_timezone_set('Asia/Manila');
+// exec('node /nfc-reader/reader.js &')
 ?>
 
 <!DOCTYPE html>
@@ -25,54 +26,91 @@ date_default_timezone_set('Asia/Manila');
         }
     </style>
     <script>
-        // JavaScript to handle dynamic time updates
-        function updateTime() {
-            const timeElement = document.getElementById('time');
-            const date = new Date();
+            function updateTime() {
+                const timeElement = document.getElementById('time');
+                const date = new Date();
 
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const ampm = hours >= 12 ? 'pm' : 'am';
-            const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-            const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+                const hours = date.getHours();
+                const minutes = date.getMinutes();
+                const ampm = hours >= 12 ? 'pm' : 'am';
+                const formattedHours = hours % 12 || 12;
+                const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
 
-            const timeString = `${formattedHours}:${formattedMinutes} ${ampm}`;
-            timeElement.textContent = timeString;
-        }
+                const timeString = `${formattedHours}:${formattedMinutes} ${ampm}`;
+                timeElement.textContent = timeString;
+            }
 
-        function initClock() {
-            updateTime(); // Update time immediately on page load
-            setInterval(updateTime, 1000); // Update every second
-        }
+            function initClock() {
+                updateTime();
+                setInterval(updateTime, 1000);
+            }
 
-        // Execute clock function after DOM loads
-        window.onload = initClock;
+            // Flag to prevent duplicate form submissions
+            let submitted = false;
+
+            // Fetch NFC card data from Node.js server
+            async function fetchCardData() {
+                try {
+                    const response = await fetch('http://localhost:4000/api/lastcard');
+                    const cardDetails = await response.json();
+
+                    if (cardDetails && cardDetails.uid && !submitted) {
+                        console.log('Card details:', cardDetails);
+                        onCardTap(cardDetails);
+                    } else if (!cardDetails.uid) {
+                        console.log('No card detected.');
+                        submitted = false; // Reset if no valid card is detected
+                    }
+                } catch (error) {
+                    console.error('Error fetching card data:', error);
+                }
+            }
+
+            // Redirect on card tap
+            function onCardTap(cardDetails) {
+                const form = document.getElementById('cardForm');
+                document.getElementById('uid').value = cardDetails.uid;
+                document.getElementById('timestamp').value = cardDetails.timestamp;
+                document.getElementById('employeeID').value = cardDetails.employeeID;
+                submitted = true; // Prevent further submissions
+                form.submit();
+            }
+
+            window.onload = () => {
+                initClock();
+                // Poll server for card data every 2 seconds
+                setInterval(fetchCardData, 2000);
+            };
     </script>
+
+
 </head>
 <body class="flex items-center justify-center min-h-screen bg-[#FFE6A3]">
-    <!-- Main Container with margin-top to adjust the positioning -->
+    <!-- Main Container -->
     <div class="text-center w-full max-w-2xl px-6 flex flex-col items-center justify-center mt-[-5%]">
-        <!-- Logo and Jollibee Title -->
         <div class="flex items-center justify-center mb-6">
             <img src="../images/jabee logo.png" alt="Jollibee Logo" class="w-20 h-25 mr-8">
             <h1 class="text-red-600 text-[60px] jollibee-font tracking-wide">Jollibee</h1>
         </div>
-        <!-- Time Confirmation Portal-->
         <p class="midnight-color text-[42px] font-bold mb-4 -mt-5">Time Confirmation Portal</p>
-        <!-- Date and Time Card (Responsive Width) -->
         <div class="w-full sm:w-[450px] md:w-[500px] lg:w-[620px] xl:w-[700px] bg-white rounded-lg shadow-lg">
-            <!-- Date -->
             <div class="bg-[#FDB55E] midnight-color text-[32px] py-2 rounded-t-lg text-center">
                 <?php echo date('F j, Y'); ?>
             </div>
             <div class="p-6 text-center">
-                <!-- Time -->
                 <p id="time" class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[110px] leading-none">
                     <?php echo date('g:i a'); ?>
                 </p>
             </div>
         </div>
         <p class="midnight-color text-[40px] mt-4">Please Tap Your Card</p> 
+
+        <!-- Form for sending data -->
+        <form id="cardForm" action="details.php" method="POST">
+            <input type="hidden" name="uid" id="uid">
+            <input type="hidden" name="timestamp" id="timestamp">
+            <input type="hidden" name="employeeID" id="employeeID">
+        </form>
     </div>
 </body>
 </html>
