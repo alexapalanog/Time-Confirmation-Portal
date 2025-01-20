@@ -11,14 +11,14 @@ date_default_timezone_set('Asia/Manila');
     <title>Break our or Time out Page</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/jellee-heavy" rel="stylesheet">
+    <link href="https://fonts.cdnfonts.com/css/jellee" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         .jollibee-font {
-            font-family: 'Jellee Heavy', sans-serif;
+            font-family: 'Jellee', sans-serif;
         }
         .midnight-color {
             color: #121212;
