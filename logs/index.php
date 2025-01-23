@@ -2,6 +2,7 @@
 // Manila Timezone
 date_default_timezone_set('Asia/Manila');
 // exec('node /nfc-reader/reader.js &')
+include 'db_connect.php';
 ?>
 
 <!DOCTYPE html>
@@ -11,7 +12,7 @@ date_default_timezone_set('Asia/Manila');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time In Page</title>
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2 ?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/jellee" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>

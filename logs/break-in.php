@@ -1,10 +1,43 @@
 <?php
 // Manila Timezone
 date_default_timezone_set('Asia/Manila');
+include 'db_connect.php';
+
+
+$employeeID = $_GET['employeeID'] ?? null;
+$employeeName = "Guest";
+$totalMinutes = 0;
+
+if ($employeeID) {
+    $sql = "SELECT first_name FROM employee WHERE employee_id = '$employeeID'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $employeeName = $row['first_name'];
+    }
+}
+if ($employeeID) {
+    // Generate timekeeping_id
+    $date = date('Ymd'); // Current date in YYYYMMDD format
+    $timekeeping_id = $employeeID . $date;
+
+    // Fetch total_minutes
+    $fetchSql = "SELECT total_minutes FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
+    $result = $conn->query($fetchSql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $totalMinutes = $row['total_minutes'];
+    }
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,14 +50,17 @@ date_default_timezone_set('Asia/Manila');
         body {
             font-family: 'Inter', sans-serif;
         }
+
         .jollibee-font {
             font-family: 'Jellee', sans-serif;
         }
+
         .midnight-color {
             color: #121212;
         }
     </style>
 </head>
+
 <body class="flex items-center justify-center min-h-screen bg-[#FFE6A3]">
     <!-- Main Container with margin-top to adjust the positioning -->
     <div class="text-center w-full max-w-2xl px-6 flex flex-col items-center justify-center mt-[-5%]">
@@ -44,28 +80,36 @@ date_default_timezone_set('Asia/Manila');
             <div class="p-6 text-center">
                 <!-- Time -->
                 <p class="midnight-color text-[60px] md:text-[70px] lg:text-[90px] xl:text-[100px] leading-none">
-                    <?php echo date('g:i a');?>
+                    <?php echo date('g:i a'); ?>
                 </p>
             </div>
         </div>
         <!-- -->
-        <p class="midnight-color text-[40px] mt-4">Hi, Name!</p>
+        <p class="midnight-color text-[40px] mt-4">Hi, <?php echo htmlspecialchars($employeeName); ?>!</p>
         <p class="midnight-color text-[28px]">Choose your action</p>
         <!-- Buttons in the Same Row -->
         <div class="flex justify-center mt-6 space-x-4">
             <form method="POST" action="confirmation-page.php">
-                <input type="hidden" name="time" value="<?php echo date('g:i A'); ?>">
-                <button 
-                    class="bg-[#BB4947] text-white text-[28px] font-bold py-2.5 px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300"
-                    name="action" value="Break in">
-                    Break-In
+                <input type="hidden" name="time" value="<?php echo date('H:i:s'); ?>">
+                <input type="hidden" name="employeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
+                <input type="hidden" name="isCheckIn" value="0">
+                <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
+                      px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300" name="action"
+                    value="Break In">
+                    Break In
                 </button>
             </form>
-            <button class="bg-[#666666] text-black text-[28px] font-bold py-2.5
-                px-6 w-[250px] rounded-xl">
-                Time-Out
-            </button>
-        </div>        
+            <form method="POST" action="confirmation-page.php">
+                <input type="hidden" name="time" value="<?php echo date('H:i:s'); ?>">
+                <input type="hidden" name="employeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
+                <input type="hidden" name="isCheckIn" value="1">
+                <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
+          px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300" name="action" value="Time-Out" <?php echo ($totalMinutes < 60) ? 'disabled' : ''; ?>>
+                    Time-Out
+                </button>
+            </form>
+        </div>
     </div>
 </body>
+
 </html>
