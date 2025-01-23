@@ -23,10 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Check if the number of break times is odd or even
         if (count($breakTimes) % 2 == 0) {
             // Even: Redirect to break-in.php
-            header("Location: break-in.php?employeeID=$employeeID");
+            header("Location: break-out.php?employeeID=$employeeID");
         } else {
             // Odd: Redirect to break-out.php
-            header("Location: break-out.php?employeeID=$employeeID");
+            header("Location: break-in.php?employeeID=$employeeID");
         }
         exit();
     } else {
