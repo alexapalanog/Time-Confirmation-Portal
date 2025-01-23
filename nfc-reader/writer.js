@@ -1,7 +1,7 @@
 const { NFC } = require('nfc-pcsc');
 const nfc = new NFC();
 
-const EMPLOYEE_ID = '098765'; // Replace with dynamic input if needed
+const EMPLOYEE_ID = '4'; // Replace with dynamic input if needed
 const BLOCK = 4; // Block to write to (MIFARE Classic 1K has 16 bytes per block)
 
 // Convert employeeID to a 16-byte buffer (padded or trimmed)
