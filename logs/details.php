@@ -8,41 +8,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timestamp = $_POST['timestamp'];
     $employeeID = $_POST['employeeID'];
 
-    // Generate timekeeping_id
-    $date = date('Ymd'); // Current date in YYYYMMDD format
-    $timekeeping_id = $employeeID . $date;
+    // Debugging: Log POST data
+    error_log("POST Data: UID=$uid, Timestamp=$timestamp, EmployeeID=$employeeID");
+
+    // Generate timekeeping_id in the format DDMMYY0001
+    $date = date('dmy'); // Current date in DDMMYY format
+    $formattedEmployeeID = str_pad($employeeID, 4, '0', STR_PAD_LEFT); // Pad employee ID to 4 digits
+    $timekeeping_id = $date . $formattedEmployeeID;
+
+    // Debugging: Log generated timekeeping_id
+    error_log("Generated Timekeeping ID: $timekeeping_id");
 
     // Check if timekeeping_id exists
     $checkSql = "SELECT * FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
     $result = $conn->query($checkSql);
 
+    // Debugging: Log SQL query and result
+    error_log("SQL Query: $checkSql");
+    if ($result) {
+        error_log("SQL Query Result: " . $result->num_rows . " rows found");
+    } else {
+        error_log("SQL Query Error: " . $conn->error);
+    }
+
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+
+        // Debugging: Log fetched row data
+        error_log("Fetched Row: " . json_encode($row));
+
+        // Check if check-in time exists
+        if (empty($row['check_in'])) {
+            // Debugging: Log redirection to time-in.php
+            error_log("No check-in time found. Redirecting to time-in.php");
+            header("Location: time-in.php?employeeID=$employeeID");
+            exit();
+        }
+
+        // Check if check-out time exists
+        if (!empty($row['check_out'])) {
+            // Debugging: Log redirection to already-checked-out.php
+            error_log("Check-out time already exists. Redirecting to already-checked-out.php");
+            header("Location: already-checked-out.php?employeeID=$employeeID");
+            exit();
+        }
+
         $breakTimes = json_decode($row['break_times'], true);
 
-        // Check if the number of break times is odd or even
-        if (count($breakTimes) % 2 == 0) {
-            // Even: Redirect to break-in.php
-            header("Location: break-in.php?employeeID=$employeeID");
+        // Debugging: Log break times
+        error_log("Break Times: " . json_encode($breakTimes));
+
+        // Check the last entry in break_times
+        if (!empty($breakTimes)) {
+            $lastBreak = end($breakTimes);
+            if ($lastBreak['breakIn'] == null) {
+                // Debugging: Log redirection to break-in.php
+                error_log("Last break has a null breakIn. Redirecting to break-in.php");
+                header("Location: break-in.php?employeeID=$employeeID");
+            } else {
+                // Debugging: Log redirection to break-out.php
+                error_log("Last break has a non-null breakIn. Redirecting to break-out.php");
+                header("Location: break-out.php?employeeID=$employeeID");
+            }
         } else {
-            // Odd: Redirect to break-out.php
+            // Debugging: Log redirection to break-in.php
+            error_log("No break times found. Redirecting to break-out.php");
             header("Location: break-out.php?employeeID=$employeeID");
         }
         exit();
     } else {
-        // Insert new entry
-        $insertSql = "INSERT INTO timekeeping (timekeeping_id, employee_id, uid, break_times, total_minutes, date)
-              VALUES ('$timekeeping_id', '$employeeID', '$uid', '[]', 0, CURDATE())"; 
-
-        if ($conn->query($insertSql) === TRUE) {
-            // Redirect to time-in.php if new record is created, passing employeeID
-            header("Location: time-in.php?employeeID=$employeeID");
-            exit();
-        } else {
-            echo "Error: " . $insertSql . "<br>" . $conn->error;
-        }
+        // Debugging: Log no timekeeping_id found
+        error_log("No timekeeping record found for ID: $timekeeping_id");
     }
-
     $conn->close();
 }
 ?>

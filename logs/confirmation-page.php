@@ -1,7 +1,7 @@
 <?php
 
 include 'db_connect.php'; // Include your database connection
-
+date_default_timezone_set('Asia/Manila');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $time = $_POST['time'];
     $employeeID = $_POST['employeeID'];
@@ -17,30 +17,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     // Generate timekeeping_id
-    $date = date('Ymd'); // Current date in YYYYMMDD format
-
-    $timekeeping_id = $employeeID . $date;
+    $date = date('dmy'); // Current date in DDMMYY format
+    $formattedEmployeeID = str_pad($employeeID, 4, '0', STR_PAD_LEFT); // Ensure employee ID is 4 digits
+    $timekeeping_id = $date . $formattedEmployeeID;
+    // print timekeeping_id
+    // Debugging: Log generated timekeeping_id 
+    error_log("Generated Timekeeping ID: $timekeeping_id");
     if ($isCheckIn == 1) {
-        $fetchSql = "SELECT check_in FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
+        $fetchSql = "SELECT check_in, status FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
         $result = $conn->query($fetchSql);
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $checkInTime = $row['check_in'];
+            $status = $row['status'];
 
-            if ($isCheckIn == 1) {
-                if (empty($checkInTime)) {
-                    // Update the check-in time
-                    $actionType = "Checked-In";
-                    $updateSql = "UPDATE timekeeping SET check_in = '$time' WHERE timekeeping_id = '$timekeeping_id'";
-                } else {
-                    // Update the check-out time
-                    $actionType = "Checked-Out";
-                    $updateSql = "UPDATE timekeeping SET check_out = '$time' WHERE timekeeping_id = '$timekeeping_id'";
+            if (empty($checkInTime)) {
+                // Update the check-in time
+                $actionType = "Checked-In";
+                $updateSql = "UPDATE timekeeping SET check_in = '$time' WHERE timekeeping_id = '$timekeeping_id'";
+
+                // If status is "Absent", update it to "Present"
+                if ($status === "absent") {
+                    $updateSql .= ", status = 'present'";
                 }
+            } else {
+                // Update the check-out time
+                $actionType = "Checked-Out";
+                $updateSql = "UPDATE timekeeping SET check_out = '$time' WHERE timekeeping_id = '$timekeeping_id'";
             }
+        } else {
+          }
+
+        if (!empty($updateSql)) {
+            $conn->query($updateSql);
+        } else {
+            error_log("No update query executed for check-in/check-out.");
         }
-        $conn->query($updateSql);
         $conn->close();
     } else {
         // Fetch current break_times
@@ -49,34 +62,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $breakTimes = json_decode($row['break_times'], true);
-            if (count($breakTimes) % 2 == 0) {
-                $actionType = "Break-in";
-                // Append new break time
-                $breakTimes[] = $time;
-                $updateSql = "UPDATE timekeeping SET break_times = '" . json_encode($breakTimes) . "' WHERE timekeeping_id = '$timekeeping_id'";
-
-            } else {
+            $breakTimes = isset($row['break_times']) && $row['break_times'] !== null 
+                ? json_decode($row['break_times'], true) 
+                : [];
+            if (empty($breakTimes) || end($breakTimes)['breakOut'] == null) {
                 $actionType = "Break-out";
-                $lastBreakTime = end($breakTimes);
-                $lastBreakTimestamp = strtotime($lastBreakTime);
-                $currentTimestamp = strtotime($time);
-                $minutesDiff = round(($currentTimestamp - $lastBreakTimestamp) / 60);
-                $fetchSql = "SELECT total_minutes, breaks FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
-                $result = $conn->query($fetchSql);
-                $row = $result->fetch_assoc();
-                $totalMinutes = $minutesDiff + $row['total_minutes'];
-                $breaks = $row['breaks'] + 1;
-                // Append new break time
-                $breakTimes[] = $time;
-                $updateSql = "UPDATE timekeeping SET break_times = '" . json_encode($breakTimes) . "', breaks = '$breaks', total_minutes = '$totalMinutes' WHERE timekeeping_id = '$timekeeping_id'";
+                // Add a new break entry with breakOut time
+                $breakTimes[] = ["breakIn" => null, "breakOut" => $time];
+                $updateSql = "UPDATE timekeeping SET break_times = '" . json_encode($breakTimes) . "' WHERE timekeeping_id = '$timekeeping_id'";
+            } else {
+                // Update the last break entry with breakIn time
+                $lastBreakIndex = count($breakTimes) - 1;
+
+                if ($breakTimes[$lastBreakIndex]['breakIn'] === null) {
+                    $actionType = "Break-in";
+                    // Replace the null value in breakIn
+                    $breakTimes[$lastBreakIndex]['breakIn'] = $time;
+
+                    // Compute the total minutes of the break
+                    $lastBreakOut = $breakTimes[$lastBreakIndex]['breakOut'];
+                    $lastBreakTimestamp = strtotime($lastBreakOut);
+                    $currentTimestamp = strtotime($time);
+                    $minutesDiff = number_format(($currentTimestamp - $lastBreakTimestamp) / 60, 4);
+
+                    // Fetch current total breaks and update
+                    $fetchSql = "SELECT breaks FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
+                    $result = $conn->query($fetchSql);
+                    $row = $result->fetch_assoc();
+                    $totalMinutes = $minutesDiff + $row['breaks'];
+
+                    $updateSql = "UPDATE timekeeping SET break_times = '" . json_encode($breakTimes) . "', breaks = '$totalMinutes' WHERE timekeeping_id = '$timekeeping_id'";
+                } else {
+                    $actionType = "Break-out";
+                    $breakTimes[] = ["breakIn" => null, "breakOut" => $time];
+                    $updateSql = "UPDATE timekeeping SET break_times = '" . json_encode($breakTimes) . "' WHERE timekeeping_id = '$timekeeping_id'";
+                }
             }
-            $conn->query($updateSql);
+
+            if (!empty($updateSql)) {
+                $conn->query($updateSql);
+            } else {
+                error_log("No update query executed for break-in/break-out.");
+            }
             $conn->close();
         }
     }
-
-
 }
 ?>
 

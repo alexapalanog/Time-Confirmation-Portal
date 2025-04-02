@@ -1,9 +1,12 @@
 <?php
-//Manila Timezone
+// Manila Timezone
 date_default_timezone_set('Asia/Manila');
 include 'db_connect.php';
+
+
 $employeeID = $_GET['employeeID'] ?? null;
 $employeeName = "Guest";
+$totalMinutes = 0;
 
 if ($employeeID) {
     $sql = "SELECT first_name FROM employee WHERE employee_id = '$employeeID'";
@@ -12,6 +15,21 @@ if ($employeeID) {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $employeeName = $row['first_name'];
+    }
+}
+if ($employeeID) {
+    // Generate timekeeping_id
+    $date = date('dmy'); // Current date in DDMMYY format
+    $formattedEmployeeID = str_pad($employeeID, 4, '0', STR_PAD_LEFT); // Pad employee ID to 4 digits
+    $timekeeping_id = $date . $formattedEmployeeID;
+
+    // Fetch total_minutes
+    $fetchSql = "SELECT breaks FROM timekeeping WHERE timekeeping_id = '$timekeeping_id'";
+    $result = $conn->query($fetchSql);
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $totalMinutes = $row['breaks'];
     }
 }
 
@@ -24,7 +42,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Break Out Page</title>
+    <title>Break In Page</title>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.cdnfonts.com/css/jellee" rel="stylesheet">
@@ -69,19 +87,30 @@ $conn->close();
         </div>
         <!-- -->
         <p class="midnight-color text-[40px] mt-4">Hi, <?php echo htmlspecialchars($employeeName); ?>!</p>
-        <p class="midnight-color text-[28px]">Click 'Break-out' to return to your task</p>
-        <!-- Break-out Button -->
-        <form method="POST" action="confirmation-page.php">
-            <input type="hidden" name="time" value="<?php echo date('H:i:s'); ?>">
-            <input type="hidden" name="employeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
-            <input type="hidden" name="isCheckIn" value="0">
-            <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
+        <p class="midnight-color text-[28px]">Choose your action</p>
+        <!-- Buttons in the Same Row -->
+        <div class="flex justify-center mt-6 space-x-4">
+            <form method="POST" action="confirmation-page.php">
+                <input type="hidden" name="time" value="<?php echo date('H:i:s'); ?>">
+                <input type="hidden" name="employeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
+                <input type="hidden" name="isCheckIn" value="0">
+                <button class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
                       px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300" name="action"
-                value="Break Out">
-                Break Out
-            </button>
-        </form>
-    </div>
+                    value="Break Out">
+                    Break Out
+                </button>
+            </form>
+            <form method="POST" action="confirmation-page.php">
+                <input type="hidden" name="time" value="<?php echo date('H:i:s'); ?>">
+                <input type="hidden" name="employeeID" value="<?php echo htmlspecialchars($employeeID); ?>">
+                <input type="hidden" name="isCheckIn" value="1">
+                <button class="mt-6 text-white text-[28px] font-bold py-2.5 px-6 w-[250px] rounded-xl transition duration-300 
+                    <?php echo ($totalMinutes < 60) ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#BB4947] hover:bg-[#9E102D]'; ?>" 
+                    name="action" value="Time-Out" <?php echo ($totalMinutes < 60) ? 'disabled' : ''; ?>>
+                    Time-Out
+                </button>
+            </form>
+        </div>
     </div>
 </body>
 
