@@ -77,6 +77,7 @@ include 'db_connect.php';
                 form.submit();
             }
 
+          
             window.onload = () => {
                 initClock();
                 // Poll server for card data every 2 seconds

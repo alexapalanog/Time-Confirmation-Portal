@@ -11,6 +11,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Debugging: Log POST data
     error_log("POST Data: UID=$uid, Timestamp=$timestamp, EmployeeID=$employeeID");
 
+    // Validate if employeeID and uid match
+    $validateSql = "SELECT * FROM employee WHERE employee_id = '$employeeID' AND uid = '$uid'";
+    $validateResult = $conn->query($validateSql);
+
+    // Debugging: Log validation query and result
+    error_log("Validation SQL Query: $validateSql");
+    if ($validateResult) {
+        error_log("Validation Query Result: " . $validateResult->num_rows . " rows found");
+    } else {
+        error_log("Validation Query Error: " . $conn->error);
+    }
+
+    if ($validateResult->num_rows === 0) {
+        // Debugging: Log mismatch and redirect
+        error_log("Employee ID and UID do not match. Redirecting to error page.");
+        header("Location: error.php?error=invalid_credentials");
+        exit();
+    }
+
     // Generate timekeeping_id in the format DDMMYY0001
     $date = date('dmy'); // Current date in DDMMYY format
     $formattedEmployeeID = str_pad($employeeID, 4, '0', STR_PAD_LEFT); // Pad employee ID to 4 digits

@@ -7,3 +7,4 @@ $dbname = "techbees";
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 ?>
+
