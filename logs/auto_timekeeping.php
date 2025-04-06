@@ -25,13 +25,36 @@ if ($stmt = $conn->prepare($query)) {
         $formattedEmployeeID = str_pad($employeeId, 4, '0', STR_PAD_LEFT); // Ensure employee ID is 4 digits
         $timekeeping_id = $date . $formattedEmployeeID;
 
+        // Check if the employee has been present for the past 6 days
+        $pastDaysQuery = "
+            SELECT COUNT(*) AS present_days
+            FROM timekeeping
+            WHERE employee_id = ?
+            AND status = 'present'
+            AND date >= DATE_SUB(?, INTERVAL 6 DAY)
+        ";
+
+        if ($pastDaysStmt = $conn->prepare($pastDaysQuery)) {
+            $pastDaysStmt->bind_param('ss', $employeeId, $currentDate);
+            $pastDaysStmt->execute();
+            $pastDaysResult = $pastDaysStmt->get_result();
+            $pastDaysRow = $pastDaysResult->fetch_assoc();
+            $presentDays = $pastDaysRow['present_days'] ?? 0;
+            $pastDaysStmt->close();
+        } else {
+            $presentDays = 0;
+        }
+
+        // Determine the status
+        $status = $presentDays == 6 ? 'rest_day' : 'absent';
+
         // Insert default timekeeping record
         $insertQuery = "INSERT INTO `techbees`.`timekeeping` 
         (`timekeeping_id`, `employee_id`, `uid`, `date`, `status`, `breaks`, `total_hours`, `target_hours`, `remarks`, `check_in`, `check_out`, `break_times`, `undertime`, `overtime`, `late`, `daytype`, `night_hours`) 
-        VALUES (?, ?, NULL, ?, 'absent', 0, 0, 8, '--', NULL, NULL, NULL, 0, 0, 0, 'ordinary', 0)";
+        VALUES (?, ?, NULL, ?, ?, 0, 0, 8, '--', NULL, NULL, NULL, 0, 0, 0, 'ordinary', 0)";
 
         if ($insertStmt = $conn->prepare($insertQuery)) {
-            $insertStmt->bind_param('sis', $timekeeping_id, $employeeId, $currentDate);
+            $insertStmt->bind_param('siss', $timekeeping_id, $employeeId, $currentDate, $status);
             $insertStmt->execute();
             $insertStmt->close();
         }

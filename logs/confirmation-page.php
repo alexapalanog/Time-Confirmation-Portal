@@ -170,3 +170,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Confirm Button -->
         <form method="POST" action="index.php">
+            <button type="submit" class="mt-6 bg-[#BB4947] text-white text-[28px] font-bold py-2.5
+            px-6 w-[250px] rounded-xl hover:bg-[#9E102D] transition duration-300">
+                Confirm
+            </button>
+        </form>
+    </div>
+</body>
+
+</html>
